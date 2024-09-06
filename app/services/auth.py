@@ -1,4 +1,5 @@
 from ..models.user import User
+from ..models.profile import Profile
 from ..schema.auth import CreateUser, Login
 from ..utils.hashing import hashPassword, checkPassword
 from ..services.token import TokenService
@@ -17,6 +18,9 @@ class AuthService:
         user = User(**create_user, password=hashed_password)
 
         user.save()
+
+        profile = Profile(user=user)
+        profile.save()
 
         # MailService.sendVerificationEmail(new_user, token);
 

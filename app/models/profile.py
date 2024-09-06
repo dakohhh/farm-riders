@@ -4,8 +4,8 @@ from .user import User
 
 class Profile(Document):
 
-    nin = StringField(max_length=11, min_length=11, required=True)
+    nin = StringField(max_length=11, min_length=11, default=None)
 
-    verification_document = URLField(required=True)
+    verification_document = URLField(default=None)
 
-    user: User = ReferenceField(User)
+    user: User = ReferenceField(User, required=True)
