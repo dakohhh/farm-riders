@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<div class="email-container">
+    <div class="email-content">
+        <p>Dear {{ firstname }} {{ lastname }},</p>
+        <p>Your order <strong>{{ orderId }}</strong> has been served at <strong>{{ vendorName }}</strong>.</p>
+        <p>Thank you for choosing our service!</p>
+        <p>Best regards,</p>
+        <p><strong>Chowgoo Team</strong></p>
+    </div>
+</div>
+{% endblock %}

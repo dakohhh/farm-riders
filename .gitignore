@@ -1,0 +1,12 @@
+env/
+__pycache__/
+routers/__pycache__/
+CHOW.txt
+.env
+.venv
+.vscode
+chowtip.txt
+mongoengine _crud.txt
+food_items.txt
+test_token.txt
+menu_routes_one.txt
