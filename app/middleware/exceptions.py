@@ -55,14 +55,17 @@ def configure_error_middleware(app: FastAPI):
     @app.exception_handler(ValidationError)
     async def mongo_validation_error_handler(request: Request, exc: ValidationError):
 
-        key_error_fields = list(exc.errors.keys())
-        
         message = exc.message
 
-        if 'role' in key_error_fields:
-            from ..enums.user import UserRoles
+        if exc.errors:
 
-            message = f"role must be one of these: {[e.value for e in UserRoles]}"
+            key_error_fields = list(exc.errors.keys())
+            
+            if 'role' in key_error_fields:
+                from ..enums.user import UserRoles
+
+                message = f"role must be one of these: {[e.value for e in UserRoles]}"
+
 
         return CustomResponse(message=message, status=status.HTTP_400_BAD_REQUEST, success=False)
     

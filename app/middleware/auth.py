@@ -18,9 +18,9 @@ class Auth:
 
     async def __call__(self, request: Request, data: HTTPAuthorizationCredentials = Depends(bearer)) -> User:
 
-        access_token_data = TokenService.verify_auth_token(data.credentials)
+        user_id = await TokenService.verify_auth_token(data.credentials)
 
-        user: Union[User, None] = User.objects.filter(id=access_token_data).first()
+        user: Union[User, None] = User.objects.filter(id=user_id).first()
 
         if user is None:
             raise BadRequestException("-middleware/user-not-found")
