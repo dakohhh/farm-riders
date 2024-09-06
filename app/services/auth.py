@@ -1,4 +1,3 @@
-from app.schema.token import TokenData
 from ..models.user import User
 from ..schema.auth import CreateUser, Login
 from ..utils.hashing import hashPassword, checkPassword
@@ -28,7 +27,7 @@ class AuthService:
                 'lastname': user.lastname,
                 'email': user.email,
                 'phone_number': user.phone_number,
-                'role': user.role,
+                'role': user.role.value,
             }
         }
 

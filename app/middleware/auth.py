@@ -12,9 +12,9 @@ bearer = HTTPBearer()
 
 
 class Auth:
-    def __init__(self, roles: Union[UserRoles, List[UserRoles]]) -> None:
+    def __init__(self, roles: Union[UserRoles, List[UserRoles] | None] = None) -> None:
 
-        self.roles = roles if isinstance(roles, list) else [roles]
+        self.roles = (roles if isinstance(roles, list) else [roles]) if roles else []
 
     async def __call__(self, request: Request, data: HTTPAuthorizationCredentials = Depends(bearer)) -> User:
 
@@ -25,7 +25,7 @@ class Auth:
         if user is None:
             raise BadRequestException("-middleware/user-not-found")
 
-        if user.role not in self.roles:
+        if self.roles and (user.role not in self.roles):
             raise ForbiddenException("-middleware/user-not-authorized")
 
         return user
