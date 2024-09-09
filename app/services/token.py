@@ -20,7 +20,7 @@ class TokenService:
 
             if current_timestamp > expire_timestamp:
                 raise ForbiddenException("invalid Token, could not validate credentials")
-            
+
             user_id = decoded_token.get("user_id")
 
             if not user_id:
@@ -30,7 +30,6 @@ class TokenService:
         except jwt.InvalidTokenError:
 
             raise ForbiddenException("Invalid Token, could not validate credentials")
-        
 
     @staticmethod
     async def generate_auth_token(user):

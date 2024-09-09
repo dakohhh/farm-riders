@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Socket.IO Location Update</title>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>Socket.IO Location Update</h1>
+    <p id="status">Connecting...</p>
+
+    <!-- Input box and send button for private messages -->
+    <div>
+        <input type="text" id="messageInput" placeholder="Enter your message">
+        <button id="sendMessageButton">Send Message</button>
+    </div>
+
+    <script>
+        // Initialize Socket.IO
+        const socket = io("http://localhost:8000", {
+            extraHeaders: {
+                authorization: `Bearer ${"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjZkZDM5ZGJlMGM2NjgyZjE0N2I0YmFiIiwiZXhwaXJlIjoxNzI1OTIzMjI3fQ.fT-l8nJGpExU3AEfFQhBc73SpD9qT5OZdvOIvcpImU8"}`
+            }
+        });
+
+        // Display connection status
+        socket.on('connect', () => {
+            document.getElementById('status').innerText = 'Connected to server';
+            console.log('Connected to server');
+        });
+
+        socket.on('disconnect', () => {
+            document.getElementById('status').innerText = 'Disconnected from server';
+            console.log('Disconnected from server');
+        });
+
+        // Function to send location update to the server
+        const updateLocation = (latitude, longitude) => {
+            socket.emit('update_location', {
+                latitude: latitude,
+                longitude: longitude
+            });
+        };
+
+        // Listen for server response
+        socket.on('location_updated', (data) => {
+            if (data.status === 'success') {
+                console.log(`Location updated to: (${data.latitude}, ${data.longitude})`);
+            } else {
+                console.error(`Location update failed: ${data.reason}`);
+            }
+        });
+
+        // Function to send private message to the server
+        const sendMessage = (message) => {
+            socket.emit('private_message', {
+                message: message
+            });
+        };
+
+        // Listen for server response to private messages
+        socket.on('message_received', (data) => {
+            console.log(`Message received from user ${data.user_id}: ${data.message}`);
+        });
+
+        // Get user's current location and send it to the server
+        const getLocationAndSend = () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+                        // const userId = 123; // Replace with actual user ID
+
+                        console.log(latitude, longitude)
+                        
+                        // Send the updated location to the server
+                        console.log("updating user location");
+                        updateLocation(latitude, longitude);
+                    },
+                    (error) => {
+                        console.error('Error getting location: ', error);
+                    }
+                );
+            } else {
+                console.error('Geolocation is not supported by this browser.');
+            }
+        };
+
+        // Call getLocationAndSend function periodically (e.g., every 10 minutes)
+        setInterval(getLocationAndSend, 1 * 1000); // 3 seconds in milliseconds
+
+
+        // Optional: Call getLocationAndSend immediately when the page loads
+        window.onload = getLocationAndSend;
+
+        // Handle send message button click
+        document.getElementById('sendMessageButton').addEventListener('click', () => {
+            const message = document.getElementById('messageInput').value;
+            if (message.trim() !== '') {
+                sendMessage(message);
+                document.getElementById('messageInput').value = ''; // Clear the input field
+            }
+        });
+    </script>
+</body>
+</html>

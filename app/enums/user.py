@@ -4,5 +4,11 @@ from enum import Enum
 class UserRoles(Enum):
     admin = "admin"
     aggregator = "aggregator"
-    vendor = "vendor"
+    driver = "driver"
     farmers = "farmers"
+
+
+class UserGender(Enum):
+    male = "male"
+    female = "female"
+    other = "other"

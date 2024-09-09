@@ -1,5 +1,6 @@
+from fastapi import APIRouter
 from ..models.user import User
-from ..models.profile import Profile
+from ..models.profile import Profile, DriverProfile
 from ..schema.auth import CreateUser, Login
 from ..utils.hashing import hashPassword, checkPassword
 from ..services.token import TokenService
@@ -13,25 +14,29 @@ class AuthService:
 
         hashed_password = hashPassword(create_user.password)
 
-        create_user = create_user.model_dump(exclude={"password"})
+        create_user_dict = create_user.model_dump(exclude={"password"})
 
-        user = User(**create_user, password=hashed_password)
+        create_user_dict.update({"password": hashed_password})
 
-        user.save()
+        user_collection = User._get_collection()
 
-        profile = Profile(user=user)
-        profile.save()
+        user = user_collection.insert_one(create_user_dict)
 
-        # MailService.sendVerificationEmail(new_user, token);
+        if create_user.role == "driver":
+            DriverProfile(user=user.inserted_id).save()
+        else: 
+            Profile(user=user.inserted_id).save()
+
+        cleaned_phone_number = create_user.phone_number.replace('tel:', '').replace('-', '')
+
+        # Send Verification Mail
 
         result = {
             'user': {
-                'id': str(user.id),
-                'firstname': user.firstname,
-                'lastname': user.lastname,
-                'email': user.email,
-                'phone_number': user.phone_number,
-                'role': user.role.value,
+                'user_id': str(user.inserted_id),
+                'has_completed_profile': False,
+                'phone_number': cleaned_phone_number,
+                'role': create_user.role,
             }
         }
 
@@ -40,19 +45,19 @@ class AuthService:
     @staticmethod
     async def login(login: Login):
 
-        user = User.objects(email=login.email).first()
+        if login.email:
+            user = User.objects.filter(email=login.email).first()
+        elif login.phone_number:
+            user: User = User.objects.filter(phone_number=login.phone_number).first()
 
         if not user:
-            raise BadRequestException("Invalid email or password")
-        
+            raise BadRequestException("incorrect email or password")
+
         valid_password: bool = checkPassword(login.password, user.password)
 
         if not valid_password:
-            raise BadRequestException("Invalid email or password")
-        
+            raise BadRequestException("incorrect email or password")
+
         token = await TokenService.generate_auth_token(user)
 
-        return {"role": user.role.value, "token": token}
-
-
-        
+        return {"role": user.role.value, "has_completed_profile": user.has_completed_profile, "token": token}

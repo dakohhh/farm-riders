@@ -1,8 +1,7 @@
 import secure
-from fastapi import Request, FastAPI
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
-from starlette.middleware.httpsredirect import HTTPSRedirectMiddleware
 
 
 secure_headers = secure.Secure()
@@ -12,7 +11,7 @@ def configure_processes_middleware(app: FastAPI):
 
     # CORS Middleware
     app.add_middleware(
-        CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"]
+        CORSMiddleware, allow_origins=["http://127.0.0.1:5500"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"]
     )
 
     app.add_middleware(GZipMiddleware, minimum_size=1000)
