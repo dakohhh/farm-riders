@@ -14,12 +14,20 @@ class Location(BaseModel):
     latitude: float
     longitude: float
 
+    class Config:
+        allow_mutation = True  # Allow updates
+
+
 
 
 class Connection(BaseModel):
     sid: str
     user: Any
     location: Optional[Location] = None
+
+    class Config:
+        allow_mutation = True  # Allow updates
+
 
 
 
@@ -40,21 +48,14 @@ class SocketMemoryDatabase():
 
     def update_user_location(self, sid:str, location:Location):
 
-
         self.connections[sid].location = location
-
-        # location = Location(latitude=latitude, longitude=longitude)
 
 
 
 
 # latitude=6.5568768 longitude=3.3488896
-    
-
-
 socket_database = SocketMemoryDatabase()
-    
-
+        
 
 
 @sio.event
@@ -74,7 +75,8 @@ async def connect(sid, environ, auth):
         
         print(f"Client {sid} connected")
 
-    except ForbiddenException:
+    except ForbiddenException as e:
+        print(e)
         await sio.disconnect(sid)
 
 @sio.event
@@ -89,7 +91,8 @@ async def private_message(sid, data):
     print(data)
 
 @sio.event
-async def update_location(sid, data):
+async def update_user_location(sid, data):
+
     location = Location(**data)
     socket_database.update_user_location(sid, location)
 

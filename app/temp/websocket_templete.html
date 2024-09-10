@@ -20,7 +20,7 @@
         // Initialize Socket.IO
         const socket = io("http://localhost:8000", {
             extraHeaders: {
-                authorization: `Bearer ${"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjZkZDM5ZGJlMGM2NjgyZjE0N2I0YmFiIiwiZXhwaXJlIjoxNzI1OTIzMjI3fQ.fT-l8nJGpExU3AEfFQhBc73SpD9qT5OZdvOIvcpImU8"}`
+                authorization: `Bearer ${"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjZkZDY5MzI5NTQxMzgwNzYwNzc0OTZkIiwiZXhwaXJlIjoxNzI2MDEzMTEzfQ.qH7X4x2meS8rB_m75_n_4MQk8_8kB5KUK7vqiWI-Er0"}`
             }
         });
 
@@ -37,7 +37,7 @@
 
         // Function to send location update to the server
         const updateLocation = (latitude, longitude) => {
-            socket.emit('update_location', {
+            socket.emit('update_user_location', {
                 latitude: latitude,
                 longitude: longitude
             });

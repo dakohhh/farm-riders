@@ -1,4 +1,6 @@
 from fastapi import APIRouter, Depends, Request
+
+from app.utils.helper_functions import find_nearest_drivers
 from ..services.user import UserService
 
 from ..utils.response import CustomResponse
@@ -8,6 +10,7 @@ from ..models.user import User
 from ..models.ride import RideRequest
 from ..schema.user import UserProfile, DriverProfile
 from ..schema.ride import RideRequestIn
+from ..libraries.socket import socket_database
 
 router = APIRouter(prefix="/user", tags=["Vendor"])
 
@@ -59,6 +62,7 @@ class DriverRequest(BaseModel):
 
 @router.post("/request/driver")
 async def request_driver(request:Request, ride_request_in: RideRequestIn,  user: User = Depends(Auth([UserRoles.farmers, UserRoles.aggregator]))):
+    from pprint import pprint
 
     ride_request_dict = ride_request_in.model_dump()
 
@@ -66,7 +70,16 @@ async def request_driver(request:Request, ride_request_in: RideRequestIn,  user:
 
     ride_request = RideRequest(**ride_request_dict)
 
-    ride_request.save()
+    # ride_request.save()
+
+    pickup_location = Location(latitude=ride_request.pickup_location.latitude, longitude=ride_request.pickup_location.longitude)
+
+    drivers = find_nearest_drivers(pickup_location, socket_database)
+
+    print(drivers)
+
+    # Get available drivers within the location
+
 
     # Find available drivers  withing the location
 
