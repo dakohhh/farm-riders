@@ -31,28 +31,28 @@ def configure_error_middleware(app: FastAPI):
     async def http_exception_handler(request: Request, exc: StarletteHTTPException):
         return CustomResponse(message=exc.detail, status=exc.status_code, success=False)
 
-    @app.exception_handler(NotUniqueError)
-    async def mongo_not_unique_error_handler(request: Request, exc: NotUniqueError):
+    # @app.exception_handler(NotUniqueError)
+    # async def mongo_not_unique_error_handler(request: Request, exc: NotUniqueError):
 
-        _args = exc.args[0]
+    #     _args = exc.args[0]
 
-        json_part = _args.split('full error: ')[1].replace("'", '"').split(", \"errmsg")[0] + '}'
+    #     json_part = _args.split('full error: ')[1].replace("'", '"').split(", \"errmsg")[0] + '}'
 
-        err = None
-        try:
-            error_details = json.loads(json_part)
+    #     err = None
+    #     try:
+    #         error_details = json.loads(json_part)
 
-            key_pattern = error_details.get('keyPattern', {})
+    #         key_pattern = error_details.get('keyPattern', {})
 
-            field: str | None = list(key_pattern.keys())[0] if key_pattern else None
+    #         field: str | None = list(key_pattern.keys())[0] if key_pattern else None
 
-            field = (field.replace("_", " ").capitalize() if "_" in field else field.capitalize()) if field else None
+    #         field = (field.replace("_", " ").capitalize() if "_" in field else field.capitalize()) if field else None
 
-            err = f"{field} already exists"
-        except json.JSONDecodeError:
-            err = "already exists"
+    #         err = f"{field} already exists"
+    #     except json.JSONDecodeError:
+    #         err = "already exists"
 
-        return CustomResponse(message=err, status=status.HTTP_400_BAD_REQUEST, success=False)
+    #     return CustomResponse(message=err, status=status.HTTP_400_BAD_REQUEST, success=False)
 
     @app.exception_handler(DuplicateKeyError)
     async def mongo_duplicate_key_error_handler(request: Request, exc: DuplicateKeyError):
