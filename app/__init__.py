@@ -15,6 +15,7 @@ from .libraries.socket import sio
 from .utils.rate_limiter import limiter
 from .middleware.exceptions import configure_error_middleware
 from .middleware.process import configure_processes_middleware
+from fastapi_cors import CORS 
 
 
 @asynccontextmanager
@@ -27,6 +28,8 @@ async def lifespan(application: FastAPI):
 
 
 app = FastAPI(title="Farm Riders Python Implementation", lifespan=lifespan)
+
+CORS(app)
 
 app_socketio = socketio.ASGIApp(sio, app)
 
@@ -46,19 +49,7 @@ app.include_router(user)
 app.include_router(upload)
 
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://127.0.0.1:5500", 
-        "http://127.0.0.1:3000", 
-        "http://localhost:3000", 
-        "http://localhost:3000/"
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=["*"],
-)
+
 
 @app.get("/")
 def home(request: Request):

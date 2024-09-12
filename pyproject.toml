@@ -30,6 +30,7 @@ python-socketio = "^5.11.4"
 geopy = "^2.4.1"
 cloudinary = "^1.41.0"
 python-multipart = "^0.0.9"
+fastapi-cors = "^0.0.6"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.2"
