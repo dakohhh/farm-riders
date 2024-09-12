@@ -55,6 +55,15 @@ class PaystackConfig(BaseSettings):
     PAYSTACK_PUBLIC_KEY: str = Field(..., env="PAYSTACK_PUBLIC_KEY")
     PAYSTACK_BASE_URL: str = Field(default="https://api.paystack.co", env="PAYSTACK_BASE_URL")
 
+class CloudinaryConfig(BaseSettings):
+    """
+    Cloudinary configurations
+    """
+
+    CLOUDINARY_CLOUD_NAME: str = Field(..., env="CLOUDINARY_CLOUD_NAME")
+    CLOUDINARY_API_KEY: str = Field(..., env="CLOUDINARY_API_KEY")
+    CLOUDINARY_API_SECRET: str = Field(..., env="CLOUDINARY_API_SECRET")
+
 
 class GlobalConfig(BaseSettings):
     """
@@ -93,6 +102,8 @@ class DevelopmentConfig(GlobalConfig):
 
     PAYSTACK: PaystackConfig = Field(default_factory=PaystackConfig)
 
+    CLOUDINARY: CloudinaryConfig = Field(default_factory=CloudinaryConfig)
+
 
 class ProductionConfig(GlobalConfig):
     """
@@ -104,6 +115,7 @@ class ProductionConfig(GlobalConfig):
     MONGODB_URI: str
     BASE_URL: str
     PAYSTACK: PaystackConfig = Field(default_factory=PaystackConfig)
+    CLOUDINARY : CloudinaryConfig = Field(default_factory=CloudinaryConfig)
 
 
 def getenv():

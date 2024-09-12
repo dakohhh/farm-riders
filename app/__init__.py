@@ -8,7 +8,7 @@ from .utils.exceptions import ForbiddenException
 from .models.user import User
 from .routers.auth import router as auth
 from .routers.user import router as user
-from .routers.farmers_and_agg import router as farmers_and_agg
+from .routers.upload import router as upload
 from .libraries.mongo import connect_to_mongo, disconnect_from_mongo
 from .libraries.socket import sio
 from .utils.rate_limiter import limiter
@@ -44,6 +44,7 @@ app.state.limiter = limiter
 
 app.include_router(auth)
 app.include_router(user)
+app.include_router(upload)
 
 
 @app.get("/")

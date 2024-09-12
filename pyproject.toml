@@ -28,6 +28,8 @@ phonenumbers = "^8.13.45"
 websockets = "^13.0.1"
 python-socketio = "^5.11.4"
 geopy = "^2.4.1"
+cloudinary = "^1.41.0"
+python-multipart = "^0.0.9"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.2"

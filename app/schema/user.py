@@ -38,7 +38,7 @@ class UserProfile(BaseModel):
     lastname: str = Field(..., example="Doe")
     gender : UserGender = Field(..., example=UserGender.male.value)
     nin: Optional[str] = Field(None, example="12345678901")
-    drivers_license_number: Optional[constr(min_length=20, max_length=20)] = Field(None, example="12345678901234567890")  # type: ignore
+    drivers_license_number: Optional[str] = Field(None, example="12345678901234567890")  # type: ignore
     documents: UserProfileDocument
 
 

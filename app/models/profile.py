@@ -40,7 +40,7 @@ class Profile(Document):
     gender = EnumField(UserGender, required=False)
 
     # NIN and Documents Upload for Verification
-    nin = StringField(required=False, unique=True, max_length=11)  # National ID number
+    nin = StringField(required=False, max_length=11)  # National ID number
     drivers_license_number = StringField(required=False, max_length=20)  # Driver's License number
 
     # Document Uploads
