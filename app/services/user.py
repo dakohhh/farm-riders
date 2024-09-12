@@ -10,7 +10,7 @@ class UserService:
     async def update_farmer_and_aggregator_profile(update_profile: UserProfile, user: User):
 
         profile_collection: Collection = Profile._get_collection()
-    
+
         update_profile_data = update_profile.model_dump(mode='json', exclude_unset=True)
 
         profile_collection.find_one_and_update({"user": user.id}, {"$set": update_profile_data})
@@ -20,13 +20,11 @@ class UserService:
         user.save()
 
         return user
-    
-
 
     async def update_driver_profile(update_profile: UserProfile, user: User):
 
         profile_collection: Collection = DriverProfile._get_collection()
-    
+
         update_profile_data = update_profile.model_dump(mode='json', exclude_unset=True)
 
         profile_collection.find_one_and_update({"user": user.id}, {"$set": update_profile_data})

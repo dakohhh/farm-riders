@@ -9,7 +9,6 @@ from ..settings import settings
 from fastapi import UploadFile
 
 
-
 cloudinary.config(
     cloud_name=settings.CLOUDINARY.CLOUDINARY_CLOUD_NAME,
     api_key=settings.CLOUDINARY.CLOUDINARY_API_KEY,

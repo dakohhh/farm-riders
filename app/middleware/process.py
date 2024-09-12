@@ -11,7 +11,17 @@ def configure_processes_middleware(app: FastAPI):
 
     # CORS Middleware
     app.add_middleware(
-        CORSMiddleware, allow_origins=["http://127.0.0.1:5500", "http://127.0.0.1:3000", "http://localhost:3000"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"]
+        CORSMiddleware,
+        allow_origins=[
+            "http://127.0.0.1:5500", 
+            "http://127.0.0.1:3000", 
+           "http://localhost:3000", 
+            "http://localhost:3000/"
+        ],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+        expose_headers=["*"],
     )
 
     app.add_middleware(GZipMiddleware, minimum_size=1000)

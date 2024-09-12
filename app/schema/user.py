@@ -36,7 +36,7 @@ class VehicleInfo(BaseModel):
 class UserProfile(BaseModel):
     firstname: str = Field(..., example="John")
     lastname: str = Field(..., example="Doe")
-    gender : UserGender = Field(..., example=UserGender.male.value)
+    gender: UserGender = Field(..., example=UserGender.male.value)
     nin: Optional[str] = Field(None, example="12345678901")
     drivers_license_number: Optional[str] = Field(None, example="12345678901234567890")  # type: ignore
     documents: UserProfileDocument

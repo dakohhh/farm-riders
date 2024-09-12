@@ -24,7 +24,7 @@ class AuthService:
 
         if create_user.role == "driver":
             DriverProfile(user=user.inserted_id).save()
-        else: 
+        else:
             Profile(user=user.inserted_id).save()
 
         cleaned_phone_number = create_user.phone_number.replace('tel:', '').replace('-', '')

@@ -1,4 +1,4 @@
-from fastapi import APIRouter,  UploadFile, File
+from fastapi import APIRouter, UploadFile, File
 from uuid import uuid4
 import cloudinary
 import cloudinary.uploader
@@ -47,7 +47,7 @@ class CloudinaryUploadResponse(BaseModel):
 @router.post("/upload")
 async def upload_file(file: UploadFile = File(...)):
 
-    file_name = str(uuid4()) 
+    file_name = str(uuid4())
 
     folder_name = "farm_riders"
 
@@ -59,12 +59,8 @@ async def upload_file(file: UploadFile = File(...)):
 
     metadata = CloudinaryUploadResponse(**response)
 
-    result = {
-        "url": metadata.secure_url,
-        "public_id": metadata.public_id,
-    }
+    result = {"url": metadata.secure_url, "public_id": metadata.public_id}
 
- 
     return CustomResponse(message="File uploaded successfully", data=result)
 
     # return await UploadService.upload_file(file, file_name)

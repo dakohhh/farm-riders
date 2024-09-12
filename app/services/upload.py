@@ -1,6 +1,7 @@
 from fastapi import UploadFile
 from ..libraries.upload import FarmRidersUpload
 
+
 class UploadService:
 
     @staticmethod
@@ -10,4 +11,3 @@ class UploadService:
         uploader = FarmRidersUpload(file_name)
 
         return uploader.handle_upload(file)
-    

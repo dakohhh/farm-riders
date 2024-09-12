@@ -2,7 +2,6 @@ from geopy.distance import geodesic
 from ..libraries.socket import Location, Connection, socket_database, SocketMemoryDatabase
 
 
-
 def calculate_distance(location1: Location, location2: Location):
     """
     Calculate distance between two points (latitude, longitude)
@@ -13,9 +12,9 @@ def calculate_distance(location1: Location, location2: Location):
     return geodesic(coords_1, coords_2).kilometers
 
 
-
-
-def find_nearest_drivers(pickup_location: Location, socket_database: SocketMemoryDatabase,  max_distance_km: float = 10.0):
+def find_nearest_drivers(
+    pickup_location: Location, socket_database: SocketMemoryDatabase, max_distance_km: float = 10.0
+):
     """
     Find drivers within max_distance_km of the pickup location.
     :param pickup_location: dictionary with 'latitude' and 'longitude'
@@ -23,7 +22,6 @@ def find_nearest_drivers(pickup_location: Location, socket_database: SocketMemor
     """
     nearby_drivers = []
 
-    
     # Iterate through all connected drivers in the in-memory database
     for sid, connection in socket_database.connections.items():
 
@@ -46,7 +44,5 @@ def find_nearest_drivers(pickup_location: Location, socket_database: SocketMemor
     # Sort drivers by distance
 
     nearby_drivers.sort(key=lambda x: x[1])
-    
+
     return nearby_drivers
-    
-    

@@ -115,13 +115,13 @@ def configure_error_middleware(app: FastAPI):
             elif error.get("type") == "enum":
                 if "_" in field:
                     field = field.replace("_", " ")
-                
+
                 message = f"{field} is invalid"
                 if field == "gender":
                     from ..enums.user import UserGender
 
                     message = f"gender must be one of these: {[e.value for e in UserGender]}"
-               
+
             else:
                 detail.append(
                     {

@@ -4,15 +4,14 @@ from datetime import datetime
 from typing import Optional
 
 
-
 # 6.4760654
 # 3.6169789
 
 
 class Location(BaseModel):
-    address: str 
+    address: str
     latitude: float = Field(..., example=6.4760654)
-    longitude : float = Field(..., example=3.6169789)
+    longitude: float = Field(..., example=3.6169789)
 
 
 class RideRequestIn(BaseModel):

@@ -16,7 +16,6 @@ from .middleware.exceptions import configure_error_middleware
 from .middleware.process import configure_processes_middleware
 
 
-
 @asynccontextmanager
 async def lifespan(application: FastAPI):
     try:
@@ -38,7 +37,6 @@ configure_error_middleware(app)
 app.mount("/socket.io", app_socketio)
 
 
-
 app.state.limiter = limiter
 
 
@@ -50,4 +48,3 @@ app.include_router(upload)
 @app.get("/")
 def home(request: Request):
     return {"version": "0.1", "name": "Farm Riders Python Implementation"}
-

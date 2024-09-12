@@ -10,8 +10,3 @@ from ..models.profile import Profile
 from ..schema.user import UserProfile, DriverProfile
 
 router = APIRouter(prefix="/user", tags=["FARMERS AND AGGREGATORS"])
-
-
-
-
-
