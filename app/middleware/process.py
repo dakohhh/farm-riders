@@ -23,11 +23,3 @@ def configure_processes_middleware(app: FastAPI):
         allow_headers=["*"],
         expose_headers=["*"],
     )
-
-    app.add_middleware(GZipMiddleware, minimum_size=1000)
-
-    @app.middleware("http")
-    async def set_secure_headers(request, call_next):
-        response = await call_next(request)
-        secure_headers.framework.fastapi(response)
-        return response

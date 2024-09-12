@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from typing import Any, Optional
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from .services.auth import TokenService
 from .utils.exceptions import ForbiddenException
 from .models.user import User
@@ -44,6 +45,20 @@ app.include_router(auth)
 app.include_router(user)
 app.include_router(upload)
 
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://127.0.0.1:5500", 
+        "http://127.0.0.1:3000", 
+        "http://localhost:3000", 
+        "http://localhost:3000/"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["*"],
+)
 
 @app.get("/")
 def home(request: Request):
