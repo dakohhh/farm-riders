@@ -23,8 +23,8 @@ class VehicleInfo(EmbeddedDocument):
 
 class Documents(EmbeddedDocument):
     selfie_photo = URLField(required=True)
-    nin_photo = URLField(required=False)
-    drivers_license_phone = URLField(required=False)
+    nin_photo = URLField()
+    drivers_license_phone = URLField()
 
 
 # https://example.com/verification_document.jpg
@@ -33,18 +33,18 @@ class Documents(EmbeddedDocument):
 class Profile(Document):
     user = ReferenceField(User, required=True)
 
-    firstname = StringField(required=False, min_length=3, max_length=50)
+    firstname = StringField(min_length=3, max_length=50)
 
-    lastname = StringField(required=False, min_length=3, max_length=50)
+    lastname = StringField(min_length=3, max_length=50)
 
-    gender = EnumField(UserGender, required=False)
+    gender = EnumField(UserGender)
 
     # NIN and Documents Upload for Verification
-    nin = StringField(required=False, max_length=11)  # National ID number
-    drivers_license_number = StringField(required=False, max_length=20)  # Driver's License number
+    nin = StringField(max_length=11)  # National ID number
+    drivers_license_number = StringField(max_length=20)  # Driver's License number
 
     # Document Uploads
-    documents = EmbeddedDocumentField(Documents, required=False)
+    documents = EmbeddedDocumentField(Documents, )
 
     meta = {'allow_inheritance': True, 'strict': False}
 
