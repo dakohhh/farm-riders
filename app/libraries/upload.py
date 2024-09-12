@@ -44,7 +44,7 @@ class Upload:
 
 class FarmRidersUpload(Upload):
 
-    private_name = "chowgoo"
+    private_name = "farm_riders"
 
     def __init__(self, file_name: str):
 
