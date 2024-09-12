@@ -29,13 +29,12 @@ async def lifespan(application: FastAPI):
 
 app = FastAPI(title="Farm Riders Python Implementation", lifespan=lifespan)
 
-CORS(app)
-
-app_socketio = socketio.ASGIApp(sio, app)
-
 configure_processes_middleware(app)
 
 configure_error_middleware(app)
+
+app_socketio = socketio.ASGIApp(sio, app)
+
 
 
 app.mount("/socket.io", app_socketio)
