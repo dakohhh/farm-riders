@@ -1,3 +1,4 @@
+import re
 from geopy.distance import geodesic
 from ..libraries.socket import Location, Connection, socket_database, SocketMemoryDatabase
 
@@ -13,7 +14,7 @@ def calculate_distance(location1: Location, location2: Location):
 
 
 def find_nearest_drivers(
-    pickup_location: Location, socket_database: SocketMemoryDatabase, max_distance_km: float = 10.0
+    pickup_location: Location, socket_database: SocketMemoryDatabase, max_distance_km: float = 30.0
 ):
     """
     Find drivers within max_distance_km of the pickup location.
@@ -28,6 +29,11 @@ def find_nearest_drivers(
         if connection.user.role.value == "driver":
 
             driver_location = connection.location
+
+            #check if driver location is available
+            if not driver_location:
+                continue
+                
 
             print(driver_location)
 
@@ -46,3 +52,18 @@ def find_nearest_drivers(
     nearby_drivers.sort(key=lambda x: x[1])
 
     return nearby_drivers
+
+
+
+
+def normalize_phone_number(phone):
+    """
+    Converts a phone number in the format 'tel:+234-705-231-6811' 
+    to a normal format '+2347052316811'.
+    
+    :param phone: Phone number string in the format 'tel:+XXX-XXX-XXX-XXXX'
+    :return: Normalized phone number as a string
+    """
+    # Use regular expression to remove everything except digits and the leading '+'
+    normalized_phone = re.sub(r'[^\d+]', '', phone)
+    return normalized_phone

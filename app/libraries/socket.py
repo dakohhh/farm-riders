@@ -91,6 +91,12 @@ async def update_user_location(sid, data):
 
 
 @sio.event
+async def accept_ride_request(sid, data):
+
+    location = Location(**data)
+    socket_database.update_user_location(sid, location)
+
+@sio.event
 async def disconnect(sid):
 
     socket_database.connections.pop(sid, None)

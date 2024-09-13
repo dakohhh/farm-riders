@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Request
 
-from app.utils.helper_functions import find_nearest_drivers
+from app.utils.helper_functions import find_nearest_drivers, normalize_phone_number
 from ..services.user import UserService
 
 from ..utils.response import CustomResponse
@@ -13,6 +13,17 @@ from ..schema.ride import RideRequestIn
 from ..libraries.socket import socket_database
 
 router = APIRouter(prefix="/user", tags=["Vendor"])
+
+
+
+@router.get("/")
+async def get_user(
+    request:Request, user: User = Depends(Auth([UserRoles.farmers, UserRoles.aggregator]))
+):
+    
+    result = await UserService.get_user(user)
+
+    return CustomResponse("Get user successful", data=result)
 
 
 @router.patch("/profile")
@@ -64,26 +75,102 @@ async def request_driver(
     ride_request_in: RideRequestIn,
     user: User = Depends(Auth([UserRoles.farmers, UserRoles.aggregator])),
 ):
-    from pprint import pprint
 
-    ride_request_dict = ride_request_in.model_dump()
+    ride_request_dict = ride_request_in.model_dump(exclude={"max_distance_km"})
 
     ride_request_dict.update({'user': user})
 
     ride_request = RideRequest(**ride_request_dict)
 
-    # ride_request.save()
+    ride_request.save()
 
     pickup_location = Location(
         latitude=ride_request.pickup_location.latitude, longitude=ride_request.pickup_location.longitude
     )
 
-    drivers = find_nearest_drivers(pickup_location, socket_database)
+    nearest_drivers = find_nearest_drivers(pickup_location, socket_database, max_distance_km=ride_request_in.max_distance_km)
 
-    print(drivers)
+    if not nearest_drivers:
+        return CustomResponse("No available drivers, try again with a larger max distance radius", status=404)
+    
+    
+    # ride_request.delete()
+
+    drivers = []
+    
+    for driver in nearest_drivers:
+        _driver_dict = driver[0].model_dump()
+
+        _driver_dict['user'] =  _driver_dict['user'].to_mongo()
+
+        _driver_dict['user']['_id'] = str(_driver_dict['user']['_id'])
+
+        _driver_dict['user']['phone_number'] = normalize_phone_number(_driver_dict['user']['phone_number'])
+
+        _driver_dict['user'].pop('password', None)
+        _driver_dict['user'].pop('balance', None)
+        
+        drivers.append(_driver_dict)
 
     # Get available drivers within the location
 
     # Find available drivers  withing the location
 
-    return CustomResponse("Request Driver")
+    result = {"ride_request_id": str(ride_request.id), "drivers": drivers}
+
+    return CustomResponse("Request Driver", data=result)
+
+
+
+
+
+@router.post("/order_truck")
+async def order_truck(
+    request: Request,
+    ride_request_in: RideRequestIn,
+    user: User = Depends(Auth([UserRoles.farmers, UserRoles.aggregator])),
+):
+
+    ride_request_dict = ride_request_in.model_dump(exclude={"max_distance_km"})
+
+    ride_request_dict.update({'user': user})
+
+    ride_request = RideRequest(**ride_request_dict)
+
+    ride_request.save()
+
+    pickup_location = Location(
+        latitude=ride_request.pickup_location.latitude, longitude=ride_request.pickup_location.longitude
+    )
+
+    nearest_drivers = find_nearest_drivers(pickup_location, socket_database, max_distance_km=ride_request_in.max_distance_km)
+
+    if not nearest_drivers:
+        return CustomResponse("No available drivers, try again with a larger max distance radius", status=404)
+    
+    
+    # ride_request.delete()
+
+    drivers = []
+    
+    for driver in nearest_drivers:
+        _driver_dict = driver[0].model_dump()
+
+        _driver_dict['user'] =  _driver_dict['user'].to_mongo()
+
+        _driver_dict['user']['_id'] = str(_driver_dict['user']['_id'])
+
+        _driver_dict['user']['phone_number'] = normalize_phone_number(_driver_dict['user']['phone_number'])
+
+        _driver_dict['user'].pop('password', None)
+        _driver_dict['user'].pop('balance', None)
+        
+        drivers.append(_driver_dict)
+
+    # Get available drivers within the location
+
+    # Find available drivers  withing the location
+
+    result = {"ride_request_id": str(ride_request.id), "drivers": drivers}
+
+    return CustomResponse("Request Driver", data=result)

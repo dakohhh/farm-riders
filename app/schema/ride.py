@@ -18,4 +18,5 @@ class RideRequestIn(BaseModel):
     pickup_location: Location
     dropoff_location: Location
     pickup_time: datetime
+    max_distance_km: float = Field(..., example=10.0)
     special_instructions: Optional[str] = None

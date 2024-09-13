@@ -2,9 +2,25 @@ from ..models.profile import Profile, DriverProfile
 from pymongo.collection import Collection
 from ..models.user import User
 from ..schema.user import UserProfile
+from ..utils.helper_functions import normalize_phone_number
 
 
 class UserService:
+
+    @staticmethod
+    async def get_user(user: User):
+
+        result = user.to_mongo()
+
+        result['_id'] = str(result['_id'])
+
+        result['phone_number'] = normalize_phone_number(result['phone_number'])
+
+        result.pop('password', None)
+
+        context = {"user": result}
+
+        return context
 
     @staticmethod
     async def update_farmer_and_aggregator_profile(update_profile: UserProfile, user: User):
