@@ -10,6 +10,7 @@ class VehicleIn(BaseModel):
 class VehicleOut(BaseModel):
     id: PydanticObjectId = Field(None, alias="_id")
     name: str
+    price: int
     image_url: str
 
     class Config:
