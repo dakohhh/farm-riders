@@ -32,11 +32,11 @@ class TokenService:
             raise ForbiddenException("Invalid Token, could not validate credentials")
 
     @staticmethod
-    async def generate_auth_token(user):
+    async def generate_auth_token(user_id: str):
 
         expire = (datetime.now() + timedelta(days=1)).timestamp()
 
-        token_data = TokenData(user_id=str(user.id), expire=int(expire))
+        token_data = TokenData(user_id=str(user_id), expire=int(expire))
 
         token = jwt.encode(token_data.model_dump(), settings.JWT_SECRET, algorithm="HS256")
 

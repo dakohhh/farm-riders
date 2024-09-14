@@ -1,12 +1,17 @@
+from beanie import PydanticObjectId
 from fastapi import APIRouter, UploadFile, File
 from uuid import uuid4
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
 
+import os
+
+
+
 from ..settings import settings
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from datetime import datetime
 from ..utils.response import CustomResponse
 
@@ -64,3 +69,6 @@ async def upload_file(file: UploadFile = File(...)):
     return CustomResponse(message="File uploaded successfully", data=result)
 
     # return await UploadService.upload_file(file, file_name)
+
+
+

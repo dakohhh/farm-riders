@@ -10,14 +10,17 @@ from mongoengine import (
     EmbeddedDocumentField,
 )
 from .user import User
+from .vehicle import Vehicle
 from ..enums.user import UserGender
 
+
+# Manufacturer & Model  (Remove this)
 
 class VehicleInfo(EmbeddedDocument):
     plate_number = StringField(required=True, max_length=20)
     vehicle_year = IntField(required=True)
-    manufacturer_model = StringField(required=True, max_length=50)
     vehicle_color = StringField(required=True, max_length=20)
+    vehicle = ReferenceField(Vehicle)
     proof_of_ownership = URLField()  # Proof of vehicle ownership
 
 

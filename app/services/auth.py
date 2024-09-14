@@ -31,11 +31,14 @@ class AuthService:
 
         # Send Verification Mail
 
+        token = await TokenService.generate_auth_token(str(user.inserted_id))
+
         result = {
             'user': {
                 'user_id': str(user.inserted_id),
                 'has_completed_profile': False,
                 'phone_number': cleaned_phone_number,
+                'token': token,
                 'role': create_user.role,
             }
         }
@@ -58,6 +61,6 @@ class AuthService:
         if not valid_password:
             raise BadRequestException("incorrect email or password")
 
-        token = await TokenService.generate_auth_token(user)
+        token = await TokenService.generate_auth_token(user.id)
 
         return {"role": user.role.value, "has_completed_profile": user.has_completed_profile, "token": token}

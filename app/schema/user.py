@@ -13,7 +13,7 @@ class User(BaseModel):
 
 
 class UserProfileDocument(BaseModel):
-    selfie_photo: HttpUrl = Field(None, example="https://example.com/selfie.jpg")
+    selfie_photo: Optional[HttpUrl] = Field(None, example="https://example.com/selfie.jpg")
     nin_photo: Optional[HttpUrl] = Field(None, example="https://example.com/nin.jpg")
     drivers_license_phone: Optional[HttpUrl] = Field(None, example="https://example.com/drivers_license.jpg")
 
@@ -28,9 +28,9 @@ class UserProfileDocument(BaseModel):
 class VehicleInfo(BaseModel):
     plate_number: str
     vehicle_year: int
-    manufacturer_model: str
+    vehicle: Optional[PydanticObjectId] = None
     vehicle_color: str
-    proof_of_ownership: HttpUrl  # Proof of vehicle ownership
+    proof_of_ownership: Optional[HttpUrl] = Field(None, example="https://example.com/proof_of_ownwership.jpg") # Proof of vehicle ownership
 
 
 class UserProfile(BaseModel):
