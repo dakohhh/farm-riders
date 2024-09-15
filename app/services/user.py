@@ -52,10 +52,8 @@ class UserService:
 
             if not vehicle:
                 raise BadRequestException('Invalid vehicle model')
-            
 
         profile_collection: Collection = DriverProfile._get_collection()
-
 
         update_profile_data = update_profile.model_dump(mode='json', exclude_unset=True)
 

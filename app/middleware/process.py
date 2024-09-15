@@ -12,9 +12,9 @@ def configure_processes_middleware(app: FastAPI):
     app.add_middleware(
         CORSMiddleware,
         allow_origins=[
-            "http://127.0.0.1:5500", 
-            "http://127.0.0.1:3000", 
-           "http://localhost:3000", 
+            "http://127.0.0.1:5500",
+            "http://127.0.0.1:3000",
+            "http://localhost:3000",
             "http://localhost:3000/",
             "https://farmriders.vercel.app/",
             "https://farmriders.vercel.app",

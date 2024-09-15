@@ -6,10 +6,9 @@ from typing import Dict, Any, Union
 from pydantic import BaseModel
 
 
-
 class SuccessResponse(BaseModel):
     message: str
-    data: Union[Dict[str, Any], Any]  
+    data: Union[Dict[str, Any], Any]
 
 
 class ErrorResponse(BaseModel):
@@ -18,10 +17,14 @@ class ErrorResponse(BaseModel):
 
 router = APIRouter(tags=["Vehicles"], prefix="/vehicles")
 
-@router.get("/",  responses={
-    200: {"model": SuccessResponse, "description": "Successful response"},
-    400: {"model": ErrorResponse, "description": "Error occurred"},
-})
+
+@router.get(
+    "/",
+    responses={
+        200: {"model": SuccessResponse, "description": "Successful response"},
+        400: {"model": ErrorResponse, "description": "Error occurred"},
+    },
+)
 async def get_all_vehicles(request: Request):
 
     result = await VehicleService.get_all_vehicles()
@@ -29,6 +32,3 @@ async def get_all_vehicles(request: Request):
     # context = {"vehicles": result.vehicles}
 
     return SuccessResponse(message="Vehicles fetched successfully", data=result)
-
-
-

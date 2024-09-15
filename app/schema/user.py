@@ -30,7 +30,9 @@ class VehicleInfo(BaseModel):
     vehicle_year: int
     vehicle: Optional[PydanticObjectId] = None
     vehicle_color: str
-    proof_of_ownership: Optional[HttpUrl] = Field(None, example="https://example.com/proof_of_ownwership.jpg") # Proof of vehicle ownership
+    proof_of_ownership: Optional[HttpUrl] = Field(
+        None, example="https://example.com/proof_of_ownwership.jpg"
+    )  # Proof of vehicle ownership
 
 
 class UserProfile(BaseModel):

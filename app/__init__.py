@@ -16,7 +16,7 @@ from .libraries.socket import sio
 from .utils.rate_limiter import limiter
 from .middleware.exceptions import configure_error_middleware
 from .middleware.process import configure_processes_middleware
-from fastapi_cors import CORS 
+from fastapi_cors import CORS
 from .scripts.vehicle_scrpts import insert_vehicles_on_startup
 
 
@@ -39,7 +39,6 @@ configure_error_middleware(app)
 app_socketio = socketio.ASGIApp(sio, app)
 
 
-
 app.mount("/socket.io", app_socketio)
 
 
@@ -52,11 +51,6 @@ app.include_router(upload)
 app.include_router(vehicle)
 
 
-
-
 @app.get("/")
 def home(request: Request):
     return {"version": "0.1", "name": "Farm Riders Python Implementation"}
-
-
-

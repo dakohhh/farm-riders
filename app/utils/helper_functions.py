@@ -30,10 +30,9 @@ def find_nearest_drivers(
 
             driver_location = connection.location
 
-            #check if driver location is available
+            # check if driver location is available
             if not driver_location:
                 continue
-                
 
             print(driver_location)
 
@@ -54,13 +53,11 @@ def find_nearest_drivers(
     return nearby_drivers
 
 
-
-
 def normalize_phone_number(phone):
     """
-    Converts a phone number in the format 'tel:+234-705-231-6811' 
+    Converts a phone number in the format 'tel:+234-705-231-6811'
     to a normal format '+2347052316811'.
-    
+
     :param phone: Phone number string in the format 'tel:+XXX-XXX-XXX-XXXX'
     :return: Normalized phone number as a string
     """

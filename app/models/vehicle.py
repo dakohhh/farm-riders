@@ -10,4 +10,3 @@ class Vehicle(Document):
     image_url = URLField()
 
     meta = {"collection": "vehicle", "strict": False}
-

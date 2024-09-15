@@ -16,6 +16,7 @@ from ..enums.user import UserGender
 
 # Manufacturer & Model  (Remove this)
 
+
 class VehicleInfo(EmbeddedDocument):
     plate_number = StringField(required=True, max_length=20)
     vehicle_year = IntField(required=True)
@@ -47,7 +48,7 @@ class Profile(Document):
     drivers_license_number = StringField()  # Driver's License number
 
     # Document Uploads
-    documents = EmbeddedDocumentField(Documents, )
+    documents = EmbeddedDocumentField(Documents)
 
     meta = {'allow_inheritance': True, 'strict': False}
 

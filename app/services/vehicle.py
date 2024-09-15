@@ -1,6 +1,7 @@
 from ..models.vehicle import Vehicle
 from ..schema.vehicle import VehicleOut, ListVehicleOut
 
+
 class VehicleService:
     @staticmethod
     async def get_all_vehicles():
@@ -8,4 +9,4 @@ class VehicleService:
 
         vehicles = ListVehicleOut(vehicles=query)
 
-        return vehicles 
+        return vehicles

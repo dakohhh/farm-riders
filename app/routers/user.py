@@ -1,26 +1,25 @@
 from fastapi import APIRouter, Depends, Request
+from enum import Enum
 
 from app.utils.helper_functions import find_nearest_drivers, normalize_phone_number
 from ..services.user import UserService
 
 from ..utils.response import CustomResponse
+from ..utils.exceptions import NotFoundException, BadRequestException
 from ..enums.user import UserRoles
 from ..middleware.auth import Auth
 from ..models.user import User
-from ..models.ride import RideRequest
+from ..models.order_truck import OrderTruckRequest
 from ..schema.user import UserProfile, DriverProfile
-from ..schema.ride import OrderTruck
+from ..schema.order_truck import OrderTruckIn, Location, OrderTruckOut
 from ..libraries.socket import socket_database
 
 router = APIRouter(prefix="/user", tags=["Vendor"])
 
 
-
 @router.get("/")
-async def get_user(
-    request:Request, user: User = Depends(Auth([UserRoles.farmers, UserRoles.aggregator]))
-):
-    
+async def get_user(request: Request, user: User = Depends(Auth([UserRoles.farmers, UserRoles.aggregator]))):
+
     result = await UserService.get_user(user)
 
     return CustomResponse("Get user successful", data=result)
@@ -43,17 +42,6 @@ async def update_driver_profile(update_profile: DriverProfile, user: User = Depe
     return CustomResponse("Profile updated successfully")
 
 
-from enum import Enum
-from pydantic import BaseModel, Field
-from beanie import PydanticObjectId
-from typing import Optional
-
-
-class Location(BaseModel):
-    latitude: float
-    longitude: float
-
-
 class DriverRequestStatus(Enum):
     pending = "pending"
     assigned = "assigned"
@@ -61,49 +49,25 @@ class DriverRequestStatus(Enum):
     cancelled = "cancelled"
 
 
-class DriverRequest(BaseModel):
-    pickup_location: Location
-    dropoff_location: Location
-    driver_id: PydanticObjectId  # Assigned driver
-    status: DriverRequestStatus  # pending, assigned, completed, cancelled
-    cost: Optional[float] = None  # Trip cost estimate
-
-
-
-
-@router.post("/order_truck")
-async def order_truck(
+@router.post("/nearest_drivers")
+async def get_nearest_driver(
     request: Request,
-    order_truck: OrderTruck,
+    pickup_location: Location,
+    max_distance_km: float = 10.0,
     user: User = Depends(Auth([UserRoles.farmers, UserRoles.aggregator])),
 ):
 
-    order_truck_dict = order_truck.model_dump(exclude={"max_distance_km"})
-
-    order_truck_dict.update({'user': user})
-
-    order_truck = RideRequest(**order_truck_dict)
-
-    order_truck.save()
-
-    pickup_location = Location(
-        latitude=order_truck.pickup_location.latitude, longitude=order_truck.pickup_location.longitude
-    )
-
-    nearest_drivers = find_nearest_drivers(pickup_location, socket_database, max_distance_km=order_truck.max_distance_km)
+    nearest_drivers = find_nearest_drivers(pickup_location, socket_database, max_distance_km=max_distance_km)
 
     if not nearest_drivers:
-        return CustomResponse("No available drivers, try again with a larger max distance radius", status=404)
-    
-    
-    # order_truck.delete()
+        raise NotFoundException("No available drivers, try again with a larger max distance radius")
 
     drivers = []
-    
+
     for driver in nearest_drivers:
         _driver_dict = driver[0].model_dump()
 
-        _driver_dict['user'] =  _driver_dict['user'].to_mongo()
+        _driver_dict['user'] = _driver_dict['user'].to_mongo()
 
         _driver_dict['user']['_id'] = str(_driver_dict['user']['_id'])
 
@@ -111,13 +75,38 @@ async def order_truck(
 
         _driver_dict['user'].pop('password', None)
         _driver_dict['user'].pop('balance', None)
-        
+
         drivers.append(_driver_dict)
+
+    result = {"drivers": drivers}
+
+    return CustomResponse("Nearest Drivers", data=result)
+
+
+@router.post("/order_truck")
+async def order_truck(
+    request: Request, order_truck: OrderTruckIn, user: User = Depends(Auth([UserRoles.farmers, UserRoles.aggregator]))
+):
+
+    order_truck_dict = order_truck.model_dump(exclude={"max_distance_km"})
+
+    order_truck_dict.update({'user': user})
+
+    order_truck_request = OrderTruckRequest(**order_truck_dict)
+
+    order_truck_request.save()
+
+
+    order_truck_out = OrderTruckOut(**order_truck_request.to_mongo().to_dict())
+
+    result = order_truck_out.model_dump(exclude_unset=True)
+
+    print(result)
 
     # Get available drivers within the location
 
     # Find available drivers  withing the location
 
-    result = {"order_truck_id": str(order_truck.id), "drivers": drivers}
+    # result = {"order_truck_id": str(order_truck.id), "drivers": drivers}
 
     return CustomResponse("Request Driver", data=result)

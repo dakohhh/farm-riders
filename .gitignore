@@ -1,6 +1,7 @@
 env/
 __pycache__/
 routers/__pycache__/
+truck_images/
 CHOW.txt
 .env
 .venv
