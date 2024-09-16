@@ -4,7 +4,7 @@ from ..models.vehicle import Vehicle
 from pymongo.collection import Collection
 from ..utils.exceptions import BadRequestException
 from ..models.user import User
-from ..schema.user import UserProfile, DriverProfile as UserDriverProfile
+from ..schema.user import UserProfileIn, DriverProfileIn
 from ..utils.helper_functions import normalize_phone_number
 
 
@@ -26,7 +26,7 @@ class UserService:
         return context
 
     @staticmethod
-    async def update_farmer_and_aggregator_profile(update_profile: UserProfile, user: User):
+    async def update_farmer_and_aggregator_profile(update_profile: UserProfileIn, user: User):
 
         profile_collection: Collection = Profile._get_collection()
 
@@ -40,7 +40,7 @@ class UserService:
 
         return user
 
-    async def update_driver_profile(update_profile: UserDriverProfile, user: User):
+    async def update_driver_profile(update_profile: DriverProfileIn, user: User):
 
         # check if manufacturer_model exists in the database
 

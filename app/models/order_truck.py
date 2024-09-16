@@ -23,7 +23,7 @@ class Location(EmbeddedDocument):
 class OrderTruckRequest(Document):
     # Farmer or aggregator
     user = ReferenceField(User, required=True)
-    driver = ReferenceField(User, default=None)
+    driver = ReferenceField(User, required=True)
     pickup_location: Location = EmbeddedDocumentField(Location, required=True)
     dropoff_location: Location = EmbeddedDocumentField(Location, required=True)
     pickup_time = DateTimeField(required=True)

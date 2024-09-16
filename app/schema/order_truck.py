@@ -32,8 +32,6 @@ class OrderTruckIn(BaseModel):
     driver: Optional[PydanticObjectId] = None
 
     # rental_duration_days: int
-
-    max_distance_km: float = Field(10.0, example=10.0)
     # special_instructions: Optional[str] = None
 
 

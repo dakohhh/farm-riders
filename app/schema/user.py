@@ -11,6 +11,15 @@ class User(BaseModel):
     phone_number: str
     role: str
 
+class UserOut(BaseModel):
+    id: PydanticObjectId = Field(alias="_id")
+    phone_number: Optional[str] = None
+    email: Optional[EmailStr] = None
+    role: Optional[str] = None
+    
+
+    
+
 
 class UserProfileDocument(BaseModel):
     selfie_photo: Optional[HttpUrl] = Field(None, example="https://example.com/selfie.jpg")
@@ -35,7 +44,7 @@ class VehicleInfo(BaseModel):
     )  # Proof of vehicle ownership
 
 
-class UserProfile(BaseModel):
+class UserProfileIn(BaseModel):
     firstname: str = Field(..., example="John")
     lastname: str = Field(..., example="Doe")
     gender: UserGender = Field(..., example=UserGender.male.value)
@@ -44,7 +53,26 @@ class UserProfile(BaseModel):
     documents: UserProfileDocument
 
 
-class DriverProfile(UserProfile):
+
+class DriverProfileIn(UserProfileIn):
     vehicle_info: VehicleInfo
     has_vehicle: bool
     not_driving_self: bool
+
+
+class UserProfileOut(BaseModel):
+    id: PydanticObjectId = Field(alias="_id")
+    firstname: Optional[str] = None
+    lastname: Optional[str] = Field(None)
+    gender: Optional[UserGender] = None
+
+
+class VehicleInfoOut(BaseModel):
+    plate_number: Optional[str]
+    vehicle_year: Optional[int]
+    vehicle: Optional[PydanticObjectId] = None
+    vehicle_color: Optional[str]
+
+class DriverProfileOut(UserProfileOut):
+    vehicle_info: Optional[VehicleInfoOut]
+

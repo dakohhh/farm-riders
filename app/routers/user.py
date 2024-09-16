@@ -9,8 +9,11 @@ from ..utils.exceptions import NotFoundException, BadRequestException
 from ..enums.user import UserRoles
 from ..middleware.auth import Auth
 from ..models.user import User
+from ..models.profile import Profile, DriverProfile
 from ..models.order_truck import OrderTruckRequest
-from ..schema.user import UserProfile, DriverProfile
+from ..models.vehicle import Vehicle
+from ..schema.user import UserProfileIn, DriverProfileIn, DriverProfileOut
+from ..schema.vehicle import VehicleOut
 from ..schema.order_truck import OrderTruckIn, Location, OrderTruckOut
 from ..libraries.socket import socket_database
 
@@ -27,7 +30,7 @@ async def get_user(request: Request, user: User = Depends(Auth([UserRoles.farmer
 
 @router.patch("/profile")
 async def update_farmer_and_aggregator_profile(
-    update_profile: UserProfile, user: User = Depends(Auth([UserRoles.farmers, UserRoles.aggregator]))
+    update_profile: UserProfileIn, user: User = Depends(Auth([UserRoles.farmers, UserRoles.aggregator]))
 ):
     await UserService.update_farmer_and_aggregator_profile(update_profile, user)
 
@@ -35,7 +38,7 @@ async def update_farmer_and_aggregator_profile(
 
 
 @router.patch("/driver/profile")
-async def update_driver_profile(update_profile: DriverProfile, user: User = Depends(Auth(UserRoles.driver))):
+async def update_driver_profile(update_profile: DriverProfileIn, user: User = Depends(Auth(UserRoles.driver))):
 
     await UserService.update_driver_profile(update_profile, user)
 
@@ -65,18 +68,42 @@ async def get_nearest_driver(
     drivers = []
 
     for driver in nearest_drivers:
-        _driver_dict = driver[0].model_dump()
+        driver_dict = driver[0].model_dump()
 
-        _driver_dict['user'] = _driver_dict['user'].to_mongo()
+        driver_dict['user'] = driver_dict['user'].to_mongo()
 
-        _driver_dict['user']['_id'] = str(_driver_dict['user']['_id'])
 
-        _driver_dict['user']['phone_number'] = normalize_phone_number(_driver_dict['user']['phone_number'])
+        driver_profile = DriverProfile.objects.filter(user=driver_dict['user']['_id']).only('firstname', 'lastname', 'vehicle_info').as_pymongo().first()
 
-        _driver_dict['user'].pop('password', None)
-        _driver_dict['user'].pop('balance', None)
+        if not driver_profile:
+            continue
+        
+        
 
-        drivers.append(_driver_dict)
+        driver_profile = DriverProfileOut(**driver_profile)
+
+        vehicle = Vehicle.objects.filter(id=driver_profile.vehicle_info.vehicle).as_pymongo().first()
+            
+        if not vehicle:
+            continue
+
+        vehicle = VehicleOut(**vehicle)
+
+        driver_profile = driver_profile.model_dump(exclude_unset=True)
+
+        driver_profile['vehicle_info']['vehicle'] = vehicle.model_dump(exclude_unset=True)
+
+        driver_dict['user']['id'] = str(driver_dict['user']['_id'])
+
+        driver_dict['user']['phone_number'] = normalize_phone_number(driver_dict['user']['phone_number'])
+
+        driver_dict['user']['profile'] = driver_profile
+        
+        driver_dict['user'].pop('_id', None)
+        driver_dict['user'].pop('password', None)
+        driver_dict['user'].pop('balance', None)
+
+        drivers.append(driver_dict)
 
     result = {"drivers": drivers}
 
@@ -87,8 +114,17 @@ async def get_nearest_driver(
 async def order_truck(
     request: Request, order_truck: OrderTruckIn, user: User = Depends(Auth([UserRoles.farmers, UserRoles.aggregator]))
 ):
+    
+    order_truck.driver
 
-    order_truck_dict = order_truck.model_dump(exclude={"max_distance_km"})
+    #Check if the driver exists
+
+    driver = User.objects.filter(id=order_truck.driver).first()
+
+    if not driver:
+        raise BadRequestException("Driver does not exists")
+
+    order_truck_dict = order_truck.model_dump(exclude={'driver'})
 
     order_truck_dict.update({'user': user})
 
