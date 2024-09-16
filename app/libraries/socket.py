@@ -60,6 +60,7 @@ async def connect(sid, environ, auth):
 
         if not user:
             await sio.disconnect(sid)  # Disconnect the user, invalid token
+            return
 
         socket_database.connect(sid, user)
 

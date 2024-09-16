@@ -21,7 +21,7 @@ router = APIRouter(prefix="/user", tags=["Vendor"])
 
 
 @router.get("/")
-async def get_user(request: Request, user: User = Depends(Auth([UserRoles.farmers, UserRoles.aggregator]))):
+async def get_user(request: Request, user: User = Depends(Auth())):
 
     result = await UserService.get_user(user)
 
