@@ -40,6 +40,8 @@ class SocketMemoryDatabase:
         print(self.connections)
 
     def update_user_location(self, sid: str, location: Location):
+        if sid not in list(self.connections.keys()):
+            return
 
         self.connections[sid].location = location
 
