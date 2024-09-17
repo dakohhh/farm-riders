@@ -12,9 +12,12 @@ from ..models.user import User
 from ..models.profile import Profile, DriverProfile
 from ..models.order_truck import OrderTruckRequest
 from ..models.vehicle import Vehicle
+from ..models.rental import Rentals, RentalRequest
 from ..schema.user import UserProfileIn, DriverProfileIn, DriverProfileOut
 from ..schema.vehicle import VehicleOut
 from ..schema.order_truck import OrderTruckIn, Location, OrderTruckOut
+from ..schema.rentals import RentalsOut, ListRentalsOut, RequestRentalsIn, RequestRentalsOut
+
 from ..libraries.socket import socket_database
 
 router = APIRouter(prefix="/user", tags=["Vendor"])
@@ -78,7 +81,6 @@ async def get_nearest_driver(
         if not driver_profile:
             continue
         
-        
 
         driver_profile = DriverProfileOut(**driver_profile)
 
@@ -132,17 +134,33 @@ async def order_truck(
 
     order_truck_request.save()
 
-
     order_truck_out = OrderTruckOut(**order_truck_request.to_mongo().to_dict())
 
     result = order_truck_out.model_dump(exclude_unset=True)
 
-    print(result)
-
-    # Get available drivers within the location
-
-    # Find available drivers  withing the location
-
-    # result = {"order_truck_id": str(order_truck.id), "drivers": drivers}
-
     return CustomResponse("Request Driver", data=result)
+
+
+
+@router.post("/rental/request")
+async def rental_service(
+    request: Request,
+    rental : RequestRentalsIn
+):
+
+    rental: Rentals | None = Rentals.objects.filter(id=rental.rental).first()
+
+    if not rental:
+        raise NotFoundException("rental service not found")
+
+    additional_fees = 0.00
+
+    total_price = float(rental.price) + additional_fees
+
+    rental_request : RentalRequest = RentalRequest.objects.create(rental=rental, total_price=total_price)
+    
+    result = RequestRentalsOut(**rental_request.to_mongo())
+
+    result = {'rental_request' : result.model_dump()}
+
+    return CustomResponse("rental services", data=result)

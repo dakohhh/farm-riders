@@ -48,8 +48,16 @@ class CloudinaryUploadResponse(BaseModel):
     api_key: str
 
 
-@router.post("/upload")
-async def upload_file(file: UploadFile = File(...)):
+
+
+
+
+from ..models.rental import Rentals
+import random
+
+
+@router.post("/upload_rental")
+async def upload_file():
 
     file_name = str(uuid4())
 
@@ -59,12 +67,37 @@ async def upload_file(file: UploadFile = File(...)):
 
     # store reference to file in database, for deletion later
 
-    response = cloudinary.uploader.upload(file.file, folder=folder_name, resource_type="auto", public_id=public_id)
+    directory_path = "./rental_images"
 
-    metadata = CloudinaryUploadResponse(**response)
+    for filename in os.listdir(directory_path):
+        file_path = os.path.join(directory_path, filename)
+        if os.path.isfile(file_path):  # Check if it's a file (ignore directories)
+            try:
+                if filename == ".DS_Store":
+                    continue
 
-    result = {"url": metadata.secure_url, "public_id": metadata.public_id}
+                cleaned_filename = filename.split(".")[0]
+                # response = cloudinary.uploader.upload(file_path)
+                response = cloudinary.uploader.upload(file_path, folder=folder_name, resource_type="auto", public_id=f"{folder_name}/{cleaned_filename}")
+                print(cleaned_filename)
 
-    return CustomResponse(message="File uploaded successfully", data=result)
+                Rentals.objects.create(
+                    name=cleaned_filename,
+                    price= random.randrange(20000, 50001, 1000),
+                    image_url=response['secure_url']
+                )
+                # Upload the file to Cloudinary
+                # print(f"Uploaded {filename}: {response['secure_url']}")
+            except Exception as e:
+                print(f"Failed to upload {filename}: {e}")
+
+    # response = cloudinary.uploader.upload(file.file, folder=folder_name, resource_type="auto", public_id=public_id)
+
+    # metadata = CloudinaryUploadResponse(**response)
+
+    # result = {"url": metadata.secure_url, "public_id": metadata.public_id}
+
+    return CustomResponse(message="File uploaded successfully", data=[])
 
     # return await UploadService.upload_file(file, file_name)
+
