@@ -11,3 +11,5 @@ mongoengine _crud.txt
 food_items.txt
 test_token.txt
 menu_routes_one.txt
+rental_images/
+truck_images/
