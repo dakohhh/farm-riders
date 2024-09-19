@@ -28,4 +28,6 @@ class Auth:
         if self.roles and (user.role not in self.roles):
             raise ForbiddenException("-middleware/user-not-authorized")
 
+        # Add a Typed user here using pydantic Annotations
+
         return user

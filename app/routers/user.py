@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, Request
 from enum import Enum
 
+from ..clients import PaystackClient, CheckoutParams
 from app.utils.helper_functions import find_nearest_drivers, normalize_phone_number
 from ..services.user import UserService
 
@@ -75,17 +76,20 @@ async def get_nearest_driver(
 
         driver_dict['user'] = driver_dict['user'].to_mongo()
 
-
-        driver_profile = DriverProfile.objects.filter(user=driver_dict['user']['_id']).only('firstname', 'lastname', 'vehicle_info').as_pymongo().first()
+        driver_profile = (
+            DriverProfile.objects.filter(user=driver_dict['user']['_id'])
+            .only('firstname', 'lastname', 'vehicle_info')
+            .as_pymongo()
+            .first()
+        )
 
         if not driver_profile:
             continue
-        
 
         driver_profile = DriverProfileOut(**driver_profile)
 
         vehicle = Vehicle.objects.filter(id=driver_profile.vehicle_info.vehicle).as_pymongo().first()
-            
+
         if not vehicle:
             continue
 
@@ -100,7 +104,7 @@ async def get_nearest_driver(
         driver_dict['user']['phone_number'] = normalize_phone_number(driver_dict['user']['phone_number'])
 
         driver_dict['user']['profile'] = driver_profile
-        
+
         driver_dict['user'].pop('_id', None)
         driver_dict['user'].pop('password', None)
         driver_dict['user'].pop('balance', None)
@@ -116,10 +120,10 @@ async def get_nearest_driver(
 async def order_truck(
     request: Request, order_truck: OrderTruckIn, user: User = Depends(Auth([UserRoles.farmers, UserRoles.aggregator]))
 ):
-    
+
     order_truck.driver
 
-    #Check if the driver exists
+    # Check if the driver exists
 
     driver = User.objects.filter(id=order_truck.driver).first()
 
@@ -141,12 +145,8 @@ async def order_truck(
     return CustomResponse("Request Driver", data=result)
 
 
-
 @router.post("/rental/request")
-async def rental_service(
-    request: Request,
-    rental : RequestRentalsIn
-):
+async def rental_service(request: Request, rental: RequestRentalsIn, user: User = Depends(Auth())):
 
     rental: Rentals | None = Rentals.objects.filter(id=rental.rental).first()
 
@@ -157,10 +157,17 @@ async def rental_service(
 
     total_price = float(rental.price) + additional_fees
 
-    rental_request : RentalRequest = RentalRequest.objects.create(rental=rental, total_price=total_price)
-    
+    rental_request: RentalRequest = RentalRequest.objects.create(rental=rental, total_price=total_price)
+
     result = RequestRentalsOut(**rental_request.to_mongo())
 
-    result = {'rental_request' : result.model_dump()}
+    metadata = {'type': 'rental_request', 'rental_request_id': str(result.id), 'user_id': str(user.id)}
+
+
+    params = CheckoutParams(email=user.email, amount=int(rental_request.total_price), metadata=metadata)
+
+    response = await PaystackClient().APIPaystackCheckoutURL(params)
+
+    result = {'rental_request': result.model_dump(), 'checkout_url': response.data["authorization_url"]}
 
     return CustomResponse("rental services", data=result)

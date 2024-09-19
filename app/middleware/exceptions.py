@@ -1,4 +1,4 @@
-import json
+import aiohttp
 from typing import Union
 from fastapi.exceptions import RequestValidationError
 from mongoengine.errors import NotUniqueError, ValidationError
@@ -20,6 +20,14 @@ from ..utils.exceptions import (
 )
 
 
+def handle_client_request_exceptions(app: FastAPI):
+
+    @app.exception_handler(aiohttp.ClientResponseError)
+    async def client_response_handler(request: Request, exc: aiohttp.ClientResponseError):
+
+        return CustomResponse(message=exc.message, status=exc.status, success=False)
+
+
 def configure_error_middleware(app: FastAPI):
 
     app.add_exception_handler(UnauthorizedException, unauthorized_exception_handler)
@@ -27,32 +35,11 @@ def configure_error_middleware(app: FastAPI):
     app.add_exception_handler(BadRequestException, bad_request_exception_handler)
     app.add_exception_handler(ForbiddenException, forbidden_exception_handler)
 
+    handle_client_request_exceptions(app)
+
     @app.exception_handler(StarletteHTTPException)
     async def http_exception_handler(request: Request, exc: StarletteHTTPException):
         return CustomResponse(message=exc.detail, status=exc.status_code, success=False)
-
-    # @app.exception_handler(NotUniqueError)
-    # async def mongo_not_unique_error_handler(request: Request, exc: NotUniqueError):
-
-    #     _args = exc.args[0]
-
-    #     json_part = _args.split('full error: ')[1].replace("'", '"').split(", \"errmsg")[0] + '}'
-
-    #     err = None
-    #     try:
-    #         error_details = json.loads(json_part)
-
-    #         key_pattern = error_details.get('keyPattern', {})
-
-    #         field: str | None = list(key_pattern.keys())[0] if key_pattern else None
-
-    #         field = (field.replace("_", " ").capitalize() if "_" in field else field.capitalize()) if field else None
-
-    #         err = f"{field} already exists"
-    #     except json.JSONDecodeError:
-    #         err = "already exists"
-
-    #     return CustomResponse(message=err, status=status.HTTP_400_BAD_REQUEST, success=False)
 
     @app.exception_handler(DuplicateKeyError)
     async def mongo_duplicate_key_error_handler(request: Request, exc: DuplicateKeyError):

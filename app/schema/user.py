@@ -11,14 +11,12 @@ class User(BaseModel):
     phone_number: str
     role: str
 
+
 class UserOut(BaseModel):
     id: PydanticObjectId = Field(alias="_id")
     phone_number: Optional[str] = None
     email: Optional[EmailStr] = None
     role: Optional[str] = None
-    
-
-    
 
 
 class UserProfileDocument(BaseModel):
@@ -53,7 +51,6 @@ class UserProfileIn(BaseModel):
     documents: UserProfileDocument
 
 
-
 class DriverProfileIn(UserProfileIn):
     vehicle_info: VehicleInfo
     has_vehicle: bool
@@ -73,6 +70,6 @@ class VehicleInfoOut(BaseModel):
     vehicle: Optional[PydanticObjectId] = None
     vehicle_color: Optional[str]
 
+
 class DriverProfileOut(UserProfileOut):
     vehicle_info: Optional[VehicleInfoOut]
-

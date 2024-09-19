@@ -35,7 +35,6 @@ class OrderTruckIn(BaseModel):
     # special_instructions: Optional[str] = None
 
 
-
 class OrderTruckOut(BaseModel):
     order_truck_id: PydanticObjectId = Field(alias="_id")
     pickup_location: Optional[Location] = None
@@ -57,4 +56,3 @@ class OrderTruckOut(BaseModel):
     @field_serializer("pickup_time")
     def serialize_pickup_time(self, value, _info):
         return str(value) if value else None
-

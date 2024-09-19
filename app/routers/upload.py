@@ -48,10 +48,6 @@ class CloudinaryUploadResponse(BaseModel):
     api_key: str
 
 
-
-
-
-
 from ..models.rental import Rentals
 import random
 
@@ -78,13 +74,13 @@ async def upload_file():
 
                 cleaned_filename = filename.split(".")[0]
                 # response = cloudinary.uploader.upload(file_path)
-                response = cloudinary.uploader.upload(file_path, folder=folder_name, resource_type="auto", public_id=f"{folder_name}/{cleaned_filename}")
+                response = cloudinary.uploader.upload(
+                    file_path, folder=folder_name, resource_type="auto", public_id=f"{folder_name}/{cleaned_filename}"
+                )
                 print(cleaned_filename)
 
                 Rentals.objects.create(
-                    name=cleaned_filename,
-                    price= random.randrange(20000, 50001, 1000),
-                    image_url=response['secure_url']
+                    name=cleaned_filename, price=random.randrange(20000, 50001, 1000), image_url=response['secure_url']
                 )
                 # Upload the file to Cloudinary
                 # print(f"Uploaded {filename}: {response['secure_url']}")
@@ -100,4 +96,3 @@ async def upload_file():
     return CustomResponse(message="File uploaded successfully", data=[])
 
     # return await UploadService.upload_file(file, file_name)
-
